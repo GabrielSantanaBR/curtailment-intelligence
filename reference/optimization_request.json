@@ -1,0 +1,1 @@
+{"plant_code":"DEMO-WIND-01","curtailed_profile_mwh":[35,50,42,28,18,12],"battery_capacity_mwh":80,"battery_initial_soc_mwh":10,"battery_max_charge_mw":40,"battery_roundtrip_efficiency":0.9,"flexible_load_capacity_mw":20,"flexible_load_total_mwh":40,"energy_value_brl_mwh":220,"grid_factor_tco2_mwh":0.08}

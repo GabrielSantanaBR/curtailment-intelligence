@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Curtailment Intelligence</title>
+  <meta name="description" content="Plataforma de antecipação e mitigação de curtailment renovável." />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+<div class="noise"></div>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">CI</span><div><b>Curtailment</b><small>Intelligence</small></div></div>
+    <nav>
+      <button class="nav active" data-view="overview">Visão geral</button>
+      <button class="nav" data-view="prediction">Predição</button>
+      <button class="nav" data-view="mitigation">Mitigação</button>
+      <button class="nav" data-view="patterns">Padrões</button>
+      <button class="nav" data-view="model">Modelo</button>
+    </nav>
+    <div class="data-badge"><span></span><div><b>Modo demonstração</b><small>Dados sintéticos</small></div></div>
+  </aside>
+  <main>
+    <header class="topbar">
+      <div><p class="kicker">COPPE/UFRJ • Hackathon IA 2026</p><h1>Energia renovável que não precisa virar desperdício.</h1></div>
+      <div class="plant-select"><label>Usina analisada</label><select id="plantSelect"></select></div>
+    </header>
+
+    <section id="view-overview" class="view active">
+      <div class="hero-grid">
+        <article class="hero-card"><div><p class="kicker">RISCO NAS PRÓXIMAS HORAS</p><div class="risk-line"><strong id="riskValue">—</strong><span id="riskLevel">—</span></div><p id="riskSubtitle">Carregando modelo...</p></div><div class="risk-orbit"><div id="riskRing" class="ring"><span id="ringText">0%</span></div></div></article>
+        <article class="impact-card"><p class="kicker">ENERGIA EM RISCO</p><strong id="energyRisk">—</strong><small>MWh esperados</small><div class="mini-rule"></div><p>A estimativa combina probabilidade do evento e magnitude condicional prevista.</p></article>
+      </div>
+      <div class="metrics-grid">
+        <article class="metric"><span>Eventos no histórico demo</span><strong id="eventRate">—</strong><small>taxa sintética</small></article>
+        <article class="metric"><span>Energia restringida</span><strong id="totalCurtailed">—</strong><small>no dataset demo</small></article>
+        <article class="metric"><span>Plantas</span><strong id="plantCount">—</strong><small>eólicas + solares</small></article>
+        <article class="metric"><span>Versão do modelo</span><strong class="small-strong" id="modelVersion">—</strong><small>artefato carregado</small></article>
+      </div>
+      <div class="two-col">
+        <article class="panel"><div class="panel-head"><div><p class="kicker">HISTÓRICO</p><h2>Geração disponível vs. realizada</h2></div><span class="tag">últimos registros</span></div><div id="generationChart" class="chart"></div></article>
+        <article class="panel"><div class="panel-head"><div><p class="kicker">EXPLICABILIDADE</p><h2>O que está puxando o risco</h2></div></div><div id="explanationList" class="explanation-list"></div><p class="footnote">Efeitos são perturbações locais do modelo; não representam causalidade.</p></article>
+      </div>
+    </section>
+
+    <section id="view-prediction" class="view">
+      <article class="panel"><div class="panel-head"><div><p class="kicker">PREDIÇÃO</p><h2>Risco temporal e curtailment observado no demo</h2></div><button class="primary" id="refreshForecast">Atualizar previsão</button></div><div id="riskChart" class="chart tall"></div></article>
+      <div class="two-col"><article class="panel"><p class="kicker">LEITURA OPERACIONAL</p><h2 id="predictionNarrative">—</h2><p>O produto separa probabilidade do evento de magnitude esperada para facilitar decisão e evitar falsa precisão.</p></article><article class="panel"><p class="kicker">REGRA DE DECISÃO</p><div class="threshold"><span>Threshold validado</span><strong id="thresholdValue">—</strong></div><p>O threshold é selecionado na validação cronológica para equilibrar F1 no conjunto demo.</p></article></div>
+    </section>
+
+    <section id="view-mitigation" class="view">
+      <div class="two-col mitigation-layout">
+        <article class="panel"><p class="kicker">CENÁRIO</p><h2>Recursos disponíveis</h2><div class="form-grid">
+          <label>Energia por hora (MWh)<input id="profileInput" value="35, 50, 42, 28, 18, 12" /></label>
+          <label>Capacidade da bateria (MWh)<input id="batteryCap" type="number" value="80" /></label>
+          <label>SOC inicial (MWh)<input id="batterySoc" type="number" value="10" /></label>
+          <label>Potência de carga (MW)<input id="batteryPower" type="number" value="40" /></label>
+          <label>Carga flexível/hora (MW)<input id="flexPower" type="number" value="20" /></label>
+          <label>Carga flexível total (MWh)<input id="flexTotal" type="number" value="40" /></label>
+        </div><button id="runOptimization" class="primary wide">Otimizar aproveitamento</button><div id="optMessage" class="message"></div></article>
+        <article class="panel result-panel"><p class="kicker">MELHOR DESPACHO NO CENÁRIO</p><div class="result-number"><strong id="recoveryPct">—</strong><span>da energia aproveitada</span></div><div class="result-pairs"><div><span>Recuperada</span><strong id="recoveredMwh">—</strong></div><div><span>Restante</span><strong id="lostMwh">—</strong></div><div><span>Valor preservado*</span><strong id="valuePreserved">—</strong></div></div><p class="footnote">*Estimativa parametrizada; não é resultado econômico oficial.</p></article>
+      </div>
+      <article class="panel"><div class="panel-head"><div><p class="kicker">DESPACHO</p><h2>Como a energia é alocada</h2></div></div><div id="dispatchChart" class="chart"></div></article>
+    </section>
+
+    <section id="view-patterns" class="view">
+      <div class="two-col"><article class="panel"><p class="kicker">PADRÃO TEMPORAL</p><h2>Taxa de eventos por hora</h2><div id="hourlyChart" class="chart"></div></article><article class="panel"><p class="kicker">MOTIVOS</p><h2>Energia por categoria simulada</h2><div id="reasonList" class="reason-list"></div></article></div>
+    </section>
+
+    <section id="view-model" class="view">
+      <article class="panel"><p class="kicker">VALIDAÇÃO</p><h2>Saúde do modelo demo</h2><div id="modelMetrics" class="metrics-grid compact"></div><div class="model-note">Split cronológico 70/15/15. O modelo final deve ser refeito com os dados oficiais, preservando a ordem temporal e excluindo qualquer variável pós-evento.</div></article>
+    </section>
+    <footer>Protótipo técnico pré-hackathon • Nunca apresentar dados sintéticos como dados do ONS.</footer>
+  </main>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
