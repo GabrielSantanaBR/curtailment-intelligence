@@ -1,5 +1,10 @@
+"""Pydantic request/response contracts used by the API."""
+
+from __future__ import annotations
+
 from datetime import datetime
-from pydantic import BaseModel, Field
+
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class PlantOut(BaseModel):
@@ -62,6 +67,19 @@ class DispatchInputs(BaseModel):
     flexible_load_total_mwh: float = Field(default=40, ge=0)
     energy_value_brl_mwh: float = Field(default=220, ge=0)
     grid_factor_tco2_mwh: float = Field(default=0.08, ge=0)
+
+    @field_validator("curtailed_profile_mwh")
+    @classmethod
+    def validate_profile(cls, values: list[float]) -> list[float]:
+        if any(value < 0 for value in values):
+            raise ValueError("curtailed_profile_mwh cannot contain negative values")
+        return values
+
+    @model_validator(mode="after")
+    def validate_battery_state(self):
+        if self.battery_initial_soc_mwh > self.battery_capacity_mwh:
+            raise ValueError("battery_initial_soc_mwh cannot exceed battery_capacity_mwh")
+        return self
 
 
 class HourDispatch(BaseModel):
