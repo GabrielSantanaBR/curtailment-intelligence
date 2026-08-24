@@ -1,0 +1,16 @@
+.git
+.github
+.venv
+venv
+__pycache__
+.pytest_cache
+.ruff_cache
+node_modules
+frontend/node_modules
+*.db
+*.sqlite3
+.env
+data/raw
+data/processed
+data/demo
+artifacts
