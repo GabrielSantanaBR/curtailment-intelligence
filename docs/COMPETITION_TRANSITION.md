@@ -1,69 +1,75 @@
-# Transition to official competition data
+# Transição para os dados oficiais da competição
 
-## 1. Freeze the raw files
+A base de software já existe. Quando o dataset oficial chegar, o trabalho principal deve ser **validar o problema e os dados**, não reconstruir a aplicação.
 
-Store untouched files in `data/raw/`. Record source, download date and any challenge-specific version. ONS says its open constrained-off data may be revised during recurring consistency processes, so reproducibility matters.
+## 1. Congelar os arquivos brutos
 
-## 2. Confirm the prediction timestamp
+Coloque arquivos intactos em `data/raw/`. Registre fonte, data de download/recebimento, período coberto e versão/dicionário associado. Não edite o CSV bruto manualmente.
 
-Before creating features, write one sentence:
-
-> At time T, the system predicts whether plant P will be curtailed in horizon H using only information that would have been available at or before T.
-
-Any field that is only known after the restriction starts must be excluded from predictors.
-
-## 3. Build the target deliberately
-
-Possible targets to test, depending on the official data:
-
-- event in the next 1/3/6 hours;
-- curtailed MWh in the next H hours;
-- risk category by plant/region.
-
-Do not assume hourly data unless the challenge data supports it.
-
-## 4. Feature groups
-
-Candidates, only if available/allowed:
-
-- calendar and seasonality;
-- plant technology/capacity;
-- generation available/forecast;
-- historical rolling curtailment statistics computed strictly from past rows;
-- system load and renewable penetration;
-- network/system indicators;
-- weather variables if supplied/allowed.
-
-## 5. Validation
-
-Use chronological holdouts. Prefer PR-AUC/recall/F1 over accuracy for an imbalanced event target. Compare against a naive historical-rate baseline.
-
-## 6. Mitigation model
-
-The optimization module is already usable, but its inputs must be presented as scenarios unless the competition provides real storage/flexible-load assets. Confirm with the thematic specialist:
-
-- connection location;
-- MW/MWh limits;
-- charge efficiency;
-- dispatch feasibility;
-- grid constraints;
-- market/operational rules.
-
-## 7. Final evidence
-
-The pitch should clearly separate:
-
-- observed historical results;
-- model-estimated risk;
-- simulated mitigation;
-- scenario-estimated economic/environmental impact.
-
-## Fast data audit command
-
-As soon as a CSV arrives, run:
+## 2. Auditar o arquivo
 
 ```bash
-python scripts/audit_dataset.py data/raw/FILE.csv
+python scripts/audit_dataset.py data/raw/ARQUIVO.csv
 ```
 
-The report flags missingness, duplicates, time parsing, detected ONS-style fields and **potential leakage/post-event columns** for manual review. The leakage list is a warning system, not an automatic verdict.
+A auditoria fornece uma primeira visão de schema, missingness, duplicatas, faixa temporal e nomes potencialmente perigosos para leakage.
+
+## 3. Definir o instante de previsão
+
+Antes de criar features, escreva uma frase inequívoca:
+
+> No instante T, o sistema prevê se a unidade P sofrerá curtailment no horizonte H usando somente informações disponíveis em ou antes de T.
+
+Se uma variável só fica conhecida depois do evento começar, ela não pode ser usada para prever aquele evento.
+
+## 4. Definir o target
+
+Possibilidades a testar conforme a granularidade oficial:
+
+- evento na próxima 1 hora;
+- evento nas próximas 3 horas;
+- evento nas próximas 6 horas;
+- MWh restringidos no horizonte;
+- risco agregado por conjunto/região.
+
+Não assumir granularidade horária sem confirmar os dados.
+
+## 5. Construir baseline primeiro
+
+Antes de modelos sofisticados, medir soluções simples: taxa histórica por usina, taxa por hora/período, Logistic Regression e regra baseada em histórico recente. O modelo final precisa superar um baseline defensável.
+
+## 6. Features candidatas
+
+Somente se disponíveis e permitidas: calendário/sazonalidade, tecnologia/capacidade, geração disponível ou previsão, estatísticas móveis estritamente passadas, carga do sistema, participação renovável, indicadores de rede/sistema e meteorologia permitida.
+
+## 7. Validação
+
+Manter ordem temporal. Preferir, conforme o target: PR-AUC, Recall, Precision, F1, Brier/calibração e MAE/RMSE para magnitude. Accuracy isolada não é suficiente para um evento desbalanceado.
+
+## 8. Integrar sem quebrar o produto
+
+A API deve continuar retornando, idealmente:
+
+```text
+risk_probability
+risk_level
+predicted_curtailed_mwh
+explanation
+model_version
+data_mode
+```
+
+Assim o frontend continua funcionando enquanto o motor interno evolui.
+
+## 9. Validar mitigação
+
+Revisar com o especialista localização do recurso, capacidade em MWh, potência em MW, eficiência, SOC, restrições de conexão, carga flexível e regras operacionais/mercado.
+
+## 10. Evidência final
+
+Na apresentação, separar claramente:
+
+- **observado**: aconteceu nos dados históricos;
+- **previsto**: estimativa do modelo;
+- **simulado**: cenário do otimizador;
+- **estimado**: impacto econômico/ambiental parametrizado.
