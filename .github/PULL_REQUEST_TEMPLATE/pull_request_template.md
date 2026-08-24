@@ -1,12 +1,24 @@
-## What changed
+## O que mudou
 
-## Why
+<!-- Resumo objetivo. -->
 
-## How it was tested
+## Por que
 
-## Data/model impact
+<!-- Problema/necessidade que motivou a mudança. -->
 
-- [ ] No new data leakage risk
-- [ ] No secrets or raw restricted data committed
-- [ ] `pytest` passes
-- [ ] Demo still runs end to end
+## Como foi testado
+
+- [ ] `python scripts/dev.py check`
+- [ ] Teste manual quando aplicável
+- [ ] Build do React quando alterei `frontend/`
+
+## Dados/modelo
+
+- [ ] Não inclui segredos ou dados restritos
+- [ ] Não cria risco novo de data leakage
+- [ ] Atualizei métricas/Model Card quando necessário
+- [ ] Não se aplica
+
+## Evidências
+
+<!-- Screenshots, métricas, exemplos de payload ou observações. -->
