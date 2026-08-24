@@ -1,25 +1,87 @@
-# Architecture
+# Arquitetura
 
-```mermaid
-flowchart LR
-    ONS[ONS / competition data] --> ADAPTER[Ingestion & schema adapter]
-    ADAPTER --> FEAT[Feature engineering]
-    FEAT --> CLF[Risk classifier]
-    FEAT --> REG[Curtailed-energy regressor]
-    CLF --> API[FastAPI]
-    REG --> API
-    API --> XAI[Local explanation]
-    API --> OPT[Scenario optimizer]
-    OPT --> IMPACT[Impact metrics]
-    API --> UI[Dashboard]
-    API --> DB[(PostgreSQL / SQLite)]
+## Objetivo
+
+Permitir desenvolvimento paralelo durante o hackathon e evitar que alterações em ML obriguem o frontend a ser refeito.
+
+## Componentes
+
+```text
+                        CLIENTES
+                ┌──────────┴──────────┐
+                │                     │
+          Dashboard /web        React /frontend
+                │                     │
+                └──────────┬──────────┘
+                           │ REST/JSON
+                           ▼
+                     app/api/routes.py
+                           │
+          ┌────────────────┼────────────────┐
+          ▼                ▼                ▼
+   data_service       model_service      optimizer
+          │                │                │
+          │                ▼                │
+          │             ml/*                │
+          │                                 │
+          └────────────────┬────────────────┘
+                           ▼
+                     SQLAlchemy / DB
 ```
 
-## Separation of concerns
+## `app/api`
 
-- **Prediction** answers: how likely is a curtailment event under currently available information?
-- **Magnitude** answers: if the event occurs, what magnitude is plausible?
-- **Optimization** answers: under explicitly declared hypothetical assets/constraints, how much energy can be absorbed?
-- **Impact** translates recovered energy into scenario KPIs.
+Responsável por HTTP:
 
-The separation is intentional. It prevents the UI from calling every downstream calculation “AI” and makes the pitch technically defensible.
+- validação de entrada;
+- códigos de status;
+- serialização;
+- chamada dos services;
+- persistência de logs/cenários.
+
+Não deve conter algoritmo de ML nem formulação matemática complexa.
+
+## `app/services`
+
+Camada de aplicação:
+
+- `data_service.py`: acesso aos dados usados pela demo;
+- `model_service.py`: carregamento de modelos, previsão e explicação;
+- `optimizer.py`: formulação de otimização;
+- `analytics.py`: agregações do dashboard.
+
+## `ml`
+
+Camada de ciência de dados:
+
+- `constants.py`: contrato de features/targets;
+- `features.py`: engenharia de features;
+- `modeling.py`: treino, seleção e métricas;
+- `ons_adapter.py`: ingestão/adaptação de fontes externas;
+- `synthetic.py`: somente demonstração.
+
+## Persistência
+
+SQLite é o padrão local por simplicidade. Em Docker, PostgreSQL é usado para deixar a arquitetura próxima de uma implantação real.
+
+Atualmente `Base.metadata.create_all` é suficiente para o protótipo. Se a modelagem de banco começar a mudar com frequência, o próximo passo é introduzir Alembic.
+
+## Frontends
+
+### `/web`
+
+Interface principal do demo. Não exige Node/npm e é servida pelo próprio FastAPI. Deve continuar sendo o plano de contingência offline.
+
+### `/frontend`
+
+Workspace React/Vite para evolução visual e trabalho independente do desenvolvedor frontend.
+
+## Contrato estável
+
+A fronteira mais importante do projeto é:
+
+```text
+frontend ← JSON → FastAPI ← Python → ML/otimizador
+```
+
+Durante a competição, tente manter os campos de resposta estáveis mesmo que o modelo interno mude completamente.
