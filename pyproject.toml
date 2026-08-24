@@ -1,7 +1,7 @@
 [project]
 name = "curtailment-intelligence"
-version = "0.9.0"
-description = "Curtailment risk, explainability and mitigation decision-support platform."
+version = "1.0.0"
+description = "Decision-support platform for renewable-generation curtailment."
 requires-python = ">=3.11"
 
 [tool.pytest.ini_options]
@@ -10,4 +10,10 @@ testpaths = ["tests"]
 addopts = "-q"
 
 [tool.ruff]
+target-version = "py311"
 line-length = 100
+exclude = ["notebooks"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = []
