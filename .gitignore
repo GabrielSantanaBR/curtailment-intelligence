@@ -1,3 +1,4 @@
+# Python
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -5,21 +6,34 @@ __pycache__/
 .ruff_cache/
 .venv/
 venv/
+.coverage
+htmlcov/
+
+# Local configuration / databases
 .env
 *.db
 *.sqlite3
+*.log
+
+# Node
 node_modules/
+frontend/node_modules/
 frontend/dist/
+
+# IDE / OS
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+
+# Raw and generated data
 data/raw/*
 data/processed/*
+data/demo/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
-
-data/demo/*
 !data/demo/.gitkeep
+
+# Generated model artifacts
 artifacts/*
 !artifacts/.gitkeep
