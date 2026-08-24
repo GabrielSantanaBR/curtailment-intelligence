@@ -1,3 +1,4 @@
+# GitHub Pages deployment for the public synthetic demo.
 name: Deploy GitHub Pages Demo
 
 on:
