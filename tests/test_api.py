@@ -9,9 +9,9 @@ os.environ.setdefault("DATABASE_URL", f"sqlite:///./{TEST_DB}")
 if TEST_DB.exists():
     TEST_DB.unlink()
 
-from fastapi.testclient import TestClient
+from fastapi.testclient import TestClient  # noqa: E402
 
-from app.main import app
+from app.main import app  # noqa: E402
 
 
 @pytest.fixture(scope="module")
