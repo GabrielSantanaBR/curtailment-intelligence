@@ -16,14 +16,21 @@ services:
   app:
     build: .
     environment:
+      APP_ENV: docker
       DATABASE_URL: postgresql+psycopg://curtailment:curtailment@db:5432/curtailment
       MODEL_DIR: /app/artifacts
       DEMO_DATA_PATH: /app/data/demo/curtailment_demo.csv
+      FRONTEND_ORIGIN: http://localhost:5173
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
 
 volumes:
   postgres_data:
