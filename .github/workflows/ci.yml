@@ -1,17 +1,55 @@
 name: CI
+
 on:
   push:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
-  test:
+  backend:
+    name: Backend / ML
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -r requirements.txt
-      - run: python scripts/bootstrap_demo.py
-      - run: pytest
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Compile Python
+        run: python -m compileall -q app ml scripts tests
+
+      - name: Static checks
+        run: ruff check app ml scripts tests
+
+      - name: Bootstrap demo
+        run: python scripts/bootstrap_demo.py
+
+      - name: Run tests
+        run: pytest
+
+  frontend:
+    name: React build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
