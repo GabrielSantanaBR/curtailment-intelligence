@@ -1,8 +1,13 @@
+"""Application settings loaded from environment variables and `.env`."""
+
 from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    app_name: str = "Curtailment Intelligence API"
+    app_version: str = "1.0.0"
     app_env: str = "development"
     database_url: str = "sqlite:///./curtailment.db"
     model_dir: str = "artifacts"
@@ -17,7 +22,7 @@ class Settings(BaseSettings):
     def project_root(self) -> Path:
         return Path(__file__).resolve().parents[2]
 
-    def resolve(self, value: str) -> Path:
+    def resolve(self, value: str | Path) -> Path:
         path = Path(value)
         return path if path.is_absolute() else self.project_root / path
 
