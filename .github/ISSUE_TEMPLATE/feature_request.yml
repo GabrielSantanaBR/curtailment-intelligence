@@ -1,0 +1,32 @@
+name: Feature request
+description: Proponha uma melhoria de produto, dados, ML, otimização ou UX.
+title: "[Feature]: "
+labels: []
+body:
+  - type: textarea
+    attributes:
+      label: Problema a resolver
+      description: Que necessidade real esta mudança atende?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Proposta
+      description: Descreva a solução sem prender a implementação cedo demais.
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Área
+      options:
+        - Backend/API
+        - Dados/ETL
+        - Machine Learning
+        - Otimização
+        - Frontend/UX
+        - Documentação
+        - Infra/DevEx
+  - type: textarea
+    attributes:
+      label: Critério de aceite
+      description: Como saberemos que está pronto?
