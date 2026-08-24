@@ -1,0 +1,35 @@
+name: Bug report
+description: Reporte um comportamento incorreto ou regressão.
+title: "[Bug]: "
+labels: []
+body:
+  - type: textarea
+    attributes:
+      label: Problema
+      description: O que aconteceu e o que você esperava?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Como reproduzir
+      description: Passos mínimos para reproduzir.
+      placeholder: |
+        1. Rode ...
+        2. Abra ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Evidências
+      description: Logs, traceback, screenshots ou payloads sem segredos.
+  - type: input
+    attributes:
+      label: Ambiente
+      placeholder: Windows 11, Python 3.12, branch main
+  - type: checkboxes
+    attributes:
+      label: Verificações
+      options:
+        - label: Não incluí dados oficiais/confidenciais nem segredos nesta issue.
+          required: true
