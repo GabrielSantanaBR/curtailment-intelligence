@@ -1,15 +1,20 @@
+"""SQLAlchemy persistence entities."""
+
 from datetime import datetime, timezone
+
 from sqlalchemy import DateTime, Float, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
+
 from app.core.db import Base
 
 
-def utcnow():
+def utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
 class Plant(Base):
     __tablename__ = "plants"
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     code: Mapped[str] = mapped_column(String(80), unique=True, index=True)
     name: Mapped[str] = mapped_column(String(180))
@@ -20,6 +25,7 @@ class Plant(Base):
 
 class PredictionLog(Base):
     __tablename__ = "prediction_logs"
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     plant_code: Mapped[str] = mapped_column(String(80), index=True)
     timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
@@ -31,6 +37,7 @@ class PredictionLog(Base):
 
 class OptimizationScenario(Base):
     __tablename__ = "optimization_scenarios"
+
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     plant_code: Mapped[str] = mapped_column(String(80), index=True)
