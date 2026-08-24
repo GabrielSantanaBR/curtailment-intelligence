@@ -1,15 +1,30 @@
 import os
+from pathlib import Path
 
-os.environ.setdefault("DATABASE_URL", "sqlite:///./test_curtailment.db")
+import pytest
 
-from fastapi.testclient import TestClient
+TEST_DB = Path("test_curtailment.db")
+os.environ.setdefault("DATABASE_URL", f"sqlite:///./{TEST_DB}")
 
-from app.main import app
+if TEST_DB.exists():
+    TEST_DB.unlink()
 
-client = TestClient(app)
+from fastapi.testclient import TestClient  # noqa: E402
+
+from app.main import app  # noqa: E402
 
 
-def test_health():
+@pytest.fixture(scope="module")
+def client():
+    """Run FastAPI lifespan so database tables exist during API tests."""
+    with TestClient(app) as test_client:
+        yield test_client
+
+    if TEST_DB.exists():
+        TEST_DB.unlink()
+
+
+def test_health(client):
     response = client.get("/health")
     assert response.status_code == 200
     payload = response.json()
@@ -17,23 +32,23 @@ def test_health():
     assert payload["version"]
 
 
-def test_overview():
+def test_overview(client):
     response = client.get("/api/v1/overview")
     assert response.status_code == 200
     assert response.json()["plants"] >= 1
 
 
-def test_plants():
+def test_plants(client):
     response = client.get("/api/v1/plants")
     assert response.status_code == 200
 
 
-def test_unknown_plant_history_returns_404():
+def test_unknown_plant_history_returns_404(client):
     response = client.get("/api/v1/plants/DOES-NOT-EXIST/history")
     assert response.status_code == 404
 
 
-def test_optimization_endpoint():
+def test_optimization_endpoint(client):
     payload = {
         "plant_code": "DEMO-WIND-01",
         "curtailed_profile_mwh": [30, 40],
@@ -51,7 +66,7 @@ def test_optimization_endpoint():
     assert response.json()["recovered_mwh"] > 0
 
 
-def test_invalid_optimization_payload_returns_422():
+def test_invalid_optimization_payload_returns_422(client):
     response = client.post(
         "/api/v1/optimize",
         json={"plant_code": "DEMO", "curtailed_profile_mwh": []},
@@ -59,7 +74,7 @@ def test_invalid_optimization_payload_returns_422():
     assert response.status_code == 422
 
 
-def test_csv_inspection_endpoint():
+def test_csv_inspection_endpoint(client):
     csv = "din_instante;id_ons;nom_usina\n2026-01-01T00:00:00Z;X;Usina X\n"
     response = client.post(
         "/api/v1/data/inspect-csv",
