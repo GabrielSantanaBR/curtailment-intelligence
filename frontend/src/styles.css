@@ -1,1 +1,130 @@
-:root{font-family:Inter,system-ui;background:#071014;color:#eef6f5}body{margin:0}main{padding:10vw}h1{font-size:8vw;color:#69dbc1}span,p{color:#8ca1a4}
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #eef6f5;
+  background: #071014;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: radial-gradient(circle at 80% 0%, rgba(47, 139, 117, 0.18), transparent 35rem), #071014;
+}
+
+.shell {
+  width: min(1100px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 56px 0;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+h1 {
+  margin: 4px 0 8px;
+  font-size: clamp(2.4rem, 7vw, 5.2rem);
+  letter-spacing: -0.06em;
+  line-height: 0.95;
+}
+
+h2 {
+  margin: 8px 0;
+}
+
+p {
+  color: #8ca1a4;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #69dbc1;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.subtitle {
+  max-width: 680px;
+}
+
+select {
+  min-width: 280px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid #20343b;
+  color: #eef6f5;
+  background: #0d1a1f;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.metric-card,
+.panel,
+.error {
+  border: 1px solid #20343b;
+  border-radius: 16px;
+  background: #0d1a1f;
+}
+
+.metric-card {
+  display: grid;
+  gap: 6px;
+  padding: 18px;
+}
+
+.metric-card span,
+.metric-card small {
+  color: #8ca1a4;
+}
+
+.metric-card strong {
+  font-size: 1.7rem;
+  letter-spacing: -0.04em;
+}
+
+.panel {
+  margin-top: 16px;
+  padding: 24px;
+}
+
+.error {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  color: #ff9b95;
+}
+
+@media (max-width: 800px) {
+  header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+}
